@@ -1,19 +1,18 @@
-/* Most of this layout shamelessly stolen from jQuery */
-
 var CloudInject = (function(){
 
 // define a local copy
-var CloudInject = function() {},
+var CloudInject = {
 
     // map over CloudInject and ci in case of overwrite
-    _CloudInject = window.CloudInject,
-    _ci = window.ci,
+    _CloudInject: window.CloudInject,
+    _ci: window.ci,
 
-    _plugin_cache = [],
+    _plugin_cache: [],
 
-    is_initialized = false,
-    jquery_ready = false,
-    controller_ready = false;
+    is_initialized: false,
+    jquery_ready: false,
+    controller_ready: false
+};
 
 CloudInject.prepare = function() {
     if(CloudInject.is_initialized) return;
@@ -92,9 +91,9 @@ CloudInject.inject = function(name, fn, version) {
     console.log("[CI] Injecting " + name + "@" + version);
 
     // stuff plugins in the cache until everything is ready
-    if(!CloudInject.is_initialized) {
+    if(!this.is_initialized) {
         console.log("[CI] Injector is not initialized. Inserting into cache.");
-        CloudInject._plugin_cache.push([name, fn, version]);
+        this._plugin_cache.push([name, fn, version]);
         return;
     }
 
@@ -104,7 +103,7 @@ CloudInject.inject = function(name, fn, version) {
     // start adding in plugins
 
     var s = document.createElement('script');
-    jQuery.each(CloudInject._plugin_cache, function(i, plugin) {
+    jQuery.each(this._plugin_cache, function(i, plugin) {
         console.log('[CI] Injecting plugin ' + plugin[0]);
         s.textContent += "(" + plugin[1] + ")(window.CloudInject, window.jQuery);";
         s.textContent += "\n\n";
