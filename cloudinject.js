@@ -82,14 +82,14 @@ CloudInject.hook_controller = function() {
 
 };
 
-CloudInject.inject = function(plugin) {
+CloudInject.inject = function(name, fn, version) {
     /* CloudInject.inject
      *
      * This function receives the plugin and evaluates it once jQuery
      * and the controller are ready.
      */
 
-    console.log("[CI] Injecting " + plugin[0]);
+    console.log("[CI] Injecting " + name + "@" + version);
 
     // stuff plugins in the cache until everything is ready
     if(this.is_initialized === false) {
