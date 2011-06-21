@@ -16,26 +16,26 @@ var CloudInject = function() {},
     controller_ready = false;
 
 CloudInject.prepare = function() {
-    if(this.is_initialized) return;
+    if(CloudInject.is_initialized) return;
 
-    if(this.jquery_ready === false) {
+    if(CloudInject.jquery_ready === false) {
         if(typeof window.jQuery != 'undefined') {
             console.log("[CI] jQuery is ready.");
-            this.jquery_ready = true;
+            CloudInject.jquery_ready = true;
         }
     }
 
-    if(this.controller_ready === false) {
+    if(CloudInject.controller_ready === false) {
         if(typeof window.controller != 'undefined') {
             console.log("[CI] Controller is ready.");
-            this.hook_controller();
-            this.controller_ready = true;
+            CloudInject.hook_controller();
+            CloudInject.controller_ready = true;
         }
     }
 
-    if(this.jquery_ready && this.controller_ready) {
+    if(CloudInject.jquery_ready && CloudInject.controller_ready) {
         console.log("[CI] CloudInject is initialized.");
-        this.is_initialized = true;
+        CloudInject.is_initialized = true;
         return;
     }
 
@@ -92,17 +92,19 @@ CloudInject.inject = function(name, fn, version) {
     console.log("[CI] Injecting " + name + "@" + version);
 
     // stuff plugins in the cache until everything is ready
-    if(this.is_initialized === false) {
+    if(!CloudInject.is_initialized) {
         console.log("[CI] Injector is not initialized. Inserting into cache.");
-        this._plugin_cache.push(plugin);
+        CloudInject._plugin_cache.push([name, fn, plugin]);
         return;
     }
+
+    console.log("[CI] CloudInject is initialized already.");
 
     // now that everything is ready, create a script element on the page and
     // start adding in plugins
 
     var s = document.createElement('script');
-    jQuery.each(this._plugin_cache, function(i, plugin) {
+    jQuery.each(CloudInject._plugin_cache, function(i, plugin) {
         console.log('[CI] Injecting plugin ' + plugin[0]);
         s.textContent += "(" + plugin[1] + ")(window.CloudInject, window.jQuery);";
         s.textContent += "\n\n";
