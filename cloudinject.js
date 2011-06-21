@@ -94,7 +94,7 @@ CloudInject.inject = function(name, fn, version) {
     // stuff plugins in the cache until everything is ready
     if(!CloudInject.is_initialized) {
         console.log("[CI] Injector is not initialized. Inserting into cache.");
-        CloudInject._plugin_cache.push([name, fn, plugin]);
+        CloudInject._plugin_cache.push([name, fn, version]);
         return;
     }
 
