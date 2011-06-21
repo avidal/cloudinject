@@ -35,6 +35,7 @@ CloudInject.prepare = function() {
     if(CloudInject.jquery_ready && CloudInject.controller_ready) {
         console.log("[CI] CloudInject is initialized.");
         CloudInject.is_initialized = true;
+        CloudInject.load_plugins();
         return;
     }
 
@@ -81,6 +82,22 @@ CloudInject.hook_controller = function() {
 
 };
 
+CloudInject.load_plugins = function() {
+
+    var s = document.createElement('script');
+    for(var i = 0; i < this._plugin_cache.length; i++) {
+        var plugin = this._plugin_cache[i];
+        console.log('[CI] Loading plugin ' + plugin[0]);
+        plugin[1](this, window.jQuery);
+    }
+
+    console.log('[CI] Clearing plugin cache.');
+    this._plugin_cache = [];
+
+    console.log("[CI] All plugins loaded.");
+
+};
+
 CloudInject.inject = function(name, fn, version) {
     /* CloudInject.inject
      *
@@ -98,19 +115,7 @@ CloudInject.inject = function(name, fn, version) {
     }
 
     console.log("[CI] CloudInject is initialized already.");
-
-    // now that everything is ready, create a script element on the page and
-    // start adding in plugins
-
-    var s = document.createElement('script');
-    jQuery.each(this._plugin_cache, function(i, plugin) {
-        console.log('[CI] Injecting plugin ' + plugin[0]);
-        s.textContent += "(" + plugin[1] + ")(window.CloudInject, window.jQuery);";
-        s.textContent += "\n\n";
-    });
-
-    jQuery("body").appendChild(s);
-    console.log("[CI] All plugins injected.");
+    this.load_plugins();
 
 };
 
