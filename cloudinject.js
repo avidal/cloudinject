@@ -7,8 +7,6 @@ var CloudInject = {
     _CloudInject: window.CloudInject,
     _ci: window.ci,
 
-    _plugin_cache: [],
-
     is_initialized: false,
     jquery_ready: false,
     controller_ready: false
@@ -16,6 +14,11 @@ var CloudInject = {
 
 CloudInject.prepare = function() {
     if(CloudInject.is_initialized) return;
+
+    // if there's no plugin cache, create it
+    if(typeof window.__ci_plugins == 'undefined') {
+        window.__ci_plugins=[];
+    }
 
     if(CloudInject.jquery_ready === false) {
         if(typeof window.jQuery != 'undefined') {
@@ -35,7 +38,8 @@ CloudInject.prepare = function() {
     if(CloudInject.jquery_ready && CloudInject.controller_ready) {
         console.log("[CI] CloudInject is initialized.");
         CloudInject.is_initialized = true;
-        CloudInject.load_plugins();
+        CloudInject.load_plugins(window.__ci_plugins);
+        window.__ci_plugins=[];
         return;
     }
 
@@ -82,40 +86,15 @@ CloudInject.hook_controller = function() {
 
 };
 
-CloudInject.load_plugins = function() {
+CloudInject.load_plugins = function(plugin_cache) {
 
-    var s = document.createElement('script');
-    for(var i = 0; i < this._plugin_cache.length; i++) {
-        var plugin = this._plugin_cache[i];
-        console.log('[CI] Loading plugin ' + plugin[0]);
+    for(var i = 0; i < plugin_cache.length; i++) {
+        var plugin = plugin_cache[i];
+        console.log('[CI] Loading plugin ' + plugin[0] + '@' + plugin[2]);
         plugin[1](this, window.jQuery);
     }
 
-    console.log('[CI] Clearing plugin cache.');
-    this._plugin_cache = [];
-
     console.log("[CI] All plugins loaded.");
-
-};
-
-CloudInject.inject = function(name, fn, version) {
-    /* CloudInject.inject
-     *
-     * This function receives the plugin and evaluates it once jQuery
-     * and the controller are ready.
-     */
-
-    console.log("[CI] Injecting " + name + "@" + version);
-
-    // stuff plugins in the cache until everything is ready
-    if(!this.is_initialized) {
-        console.log("[CI] Injector is not initialized. Inserting into cache.");
-        this._plugin_cache.push([name, fn, version]);
-        return;
-    }
-
-    console.log("[CI] CloudInject is initialized already.");
-    this.load_plugins();
 
 };
 
