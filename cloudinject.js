@@ -1,5 +1,10 @@
 var CloudInject = (function(){
 
+// if window.CloudInject exists already, then return it
+if(typeof window.CloudInject != 'undefined') {
+    return window.CloudInject;
+}
+
 // define a local copy
 var CloudInject = {
 
