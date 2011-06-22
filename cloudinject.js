@@ -51,7 +51,6 @@ var CloudInject = function() {},
     };
 
 CloudInject.prepare = function() {
-    console.log('[CI] Preparing library.');
     if(_is_initialized) return;
 
     // if there's no plugin cache, create it
@@ -101,7 +100,7 @@ CloudInject.loadPlugins = function(plugin_cache) {
 };
 
 if(_CI) {
-    console.log('window.CloudInject already exists. Returning it.');
+    console.log('[CI] Library already exists.');
     return _CI;
 }
 
