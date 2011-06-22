@@ -73,11 +73,106 @@ var CloudInject = function() {},
             };
         });
 
+        // Patch context menus
+        // TODO: Clean this up and consolidate it with the above
+        // code
+        var ctx = controller.view.memberContextMenuView;
+        var patch_name = '__cloudinject_showMenu';
+
+        if(ctx.hasOwnProperty(patch_name)) {
+            console.warn('Member context showMenu is already patched!');
+        } else {
+            ctx[patch_name] = ctx.showMenu;
+            ctx.showMenu = function() {
+                ctx[patch_name].apply(controller.view.memberContextMenuView,
+                                      arguments);
+                var member = ctx.memberView.member;
+                $(document).trigger('show.membercontext.cloudinject', member);
+            }
+           controller.view.memberContextMenuView = ctx;
+        }
+
         console.groupEnd();
 
     };
 
 CloudInject.version = '0.1.1';
+
+/*
+ * CloudInject.addToMemberContext
+ *
+ * Adds an option to the IRCCloud member context menu (accessible via clicking
+ * on a user).
+ *
+ * Pass it an element and that element will be added to the context menu.
+ * You can optionally pass in a callback that will be fired when your menu
+ * item is clicked.
+ *
+ * The second form is where you pass in the element, followed by an options
+ * object. The options object can have the following keys:
+ *
+ *  selector: A selector used to determine the element to bind to.
+ *  event: Which event to bind.
+ *  callback: A function that will be called when the `event` is triggerd on
+ *      the `selector`.
+ *
+ * Your callback will be passed a member object representing the member that
+ * the context menu was opened for.
+ *
+ * Note, whatever you pass will be wrapped in an <li> tag. This means that if
+ * you pass in a single entry that contains multiple elements (like a paragraph
+ * and an input) you must wrap them all in a single element first (such as
+ * a form).
+ */
+CloudInject.addToMemberContext = function(elem, options) {
+    console.log('[CI] Adding to member context menu.');
+
+    // make sure the passed element is a jQuery object
+    elem = jQuery(elem);
+
+    var ctx = controller.view.memberContextMenuView.container;
+    var menu = ctx.find('ul.actions.cloudinject-context');
+
+    // if there isn't an additional ul.actions, add it
+    if(menu.length === 0) {
+        console.debug('[CI] Creating CloudInject member context submenu.');
+        menu = jQuery('<ul/>', {
+            'class': 'actions __ci-context',
+            'style': 'display:block;'
+        });
+
+        ctx.append(menu);
+    }
+
+    menu.append(elem);
+
+    // wrap the passed element in an li
+    elem.wrap('<li/>');
+
+    var selector, evt, callback;
+
+    if(typeof options === 'function') {
+        selector = elem;
+        evt = 'click';
+        callback = options;
+    } else {
+        selector = options.selector;
+        evt = options.evt;
+        callback = options.callback;
+    }
+
+    var fn = function(event) {
+        var member = controller.view.memberContextMenuView.memberView.member;
+        callback.call(this, event, member);
+    };
+
+    if(elem === selector) {
+        elem.bind(evt, fn);
+    } else {
+        elem.find(selector).bind(evt, fn);
+    }
+
+};
 
 /*
  * CloudInject.loadPlugins
