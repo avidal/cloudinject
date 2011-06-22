@@ -77,6 +77,8 @@ var CloudInject = function() {},
 
     };
 
+CloudInject.version = '0.1.1';
+
 /*
  * CloudInject.loadPlugins
  *
@@ -158,11 +160,13 @@ CloudInject.prepare = function() {
 
 
 if(_CI) {
-    console.warn('[CI] Library already exists.');
+    console.warn('[CI] Library already exists. Existing version: %s',
+                 _CI.version);
     return _CI;
 }
 
-console.info('[CI] Returning library.');
+console.info('[CI] CloudInject version %s successfully initialized.',
+             CloudInject.version);
 return CloudInject;
 
 })();
